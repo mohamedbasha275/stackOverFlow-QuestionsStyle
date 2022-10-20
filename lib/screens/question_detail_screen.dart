@@ -1,7 +1,9 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:stackover/models/main_data.dart';
-import 'package:stackover/providers/questions.dart';
+import 'package:stackover/models/questions.dart';
+import 'package:stackover/services/app_colors.dart';
+import 'package:stackover/services/app_constants.dart';
+import 'package:stackover/services/app_helper.dart';
 import 'package:stackover/widgets/app_bar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -18,16 +20,16 @@ class QuestionDetailScreenState extends State<QuestionDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final itemId = ModalRoute.of(context)!.settings.arguments as int;
-    final question =
-        Provider.of<Questions>(context, listen: false).findById(itemId);
+    final question = Provider.of<Questions>(context, listen: false).findById(itemId);
+    bool isConnected = Provider.of<Questions>(context,listen: false).isConnected;
     return Scaffold(
       appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(80),
+        preferredSize: Size.fromHeight(AppConstants.appBarHeight),
         child: MyAppBar(),
       ),
       body: Container(
         width: context.screenWidth,
-        margin: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -38,13 +40,15 @@ class QuestionDetailScreenState extends State<QuestionDetailScreen> {
                   .headline5!
                   .copyWith(fontSize: 18, fontWeight: FontWeight.w500),
             ),
-            SizedBox(height: 15,),
+            const SizedBox(
+              height: 15,
+            ),
             GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                childAspectRatio: 1.4,
+                crossAxisCount: 3,
+                childAspectRatio: 1.8,
                 crossAxisSpacing: 0, // افقي
                 mainAxisSpacing: 0, // رأسي
               ),
@@ -52,12 +56,12 @@ class QuestionDetailScreenState extends State<QuestionDetailScreen> {
               itemBuilder: (ctx, i) => Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color: const Color.fromRGBO(225, 236, 244, 1),
+                  color: Theme.of(context).indicatorColor,
                 ),
                 margin: const EdgeInsets.only(top: 10, right: 10),
                 padding: const EdgeInsets.all(10),
                 child: Text(
-                  question.tags[i],
+                  question.tags[i].name,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -83,9 +87,9 @@ class QuestionDetailScreenState extends State<QuestionDetailScreen> {
                     ),
                     Text(" (${question.answerCount}) answer"),
                     if (question.isAnswered)
-                      const Icon(
+                      Icon(
                         Icons.check_circle,
-                        color: Color.fromRGBO(47, 111, 69, 1),
+                        color: AppColors.successColor,
                       ),
                   ],
                 ),
@@ -104,43 +108,40 @@ class QuestionDetailScreenState extends State<QuestionDetailScreen> {
             ),
             Container(
               width: context.screenWidth * 0.6,
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                color: const Color.fromRGBO(218, 234, 248, 1),
+                color: AppColors.cardColor,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("asked ${question.fullDate}"),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Row(
                     children: [
-                      if (question.ownerImage != null)
-                        Image.network(
-                          question.ownerImage,
-                          width: 60,
-                          height: 60,
-                        ),
-                      SizedBox(
+                      (isConnected)?
+                      Image.network(
+                        question.owner.image,
+                        width: 60,
+                        height: 60,
+                      ):
+                      Image.asset('assets/images/avatar.png',
+                        width: 60,
+                        height: 60,
+                      ),
+                      const SizedBox(
                         width: 10,
                       ),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           TextButton(
-                            onPressed: () async {
-                              if (!await launchUrl(
-                                Uri.parse(question.ownerProfile),
-                                mode: LaunchMode.externalApplication,
-                              )) {
-                                throw 'Could not launch ${question.ownerProfile}';
-                              }
-                            },
+                            onPressed: () => lunchUrl(question.owner.profile),
                             child: Text(
-                              question.ownerName,
+                              question.owner.name,
                               style: Theme.of(context)
                                   .textTheme
                                   .headline5!
@@ -151,11 +152,11 @@ class QuestionDetailScreenState extends State<QuestionDetailScreen> {
                           ),
                           Row(
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.circle,
-                                color: Colors.green,
+                                color: AppColors.successColor,
                               ),
-                              Text("${question.lastActive}"),
+                              Text(question.lastActive),
                             ],
                           ),
                         ],

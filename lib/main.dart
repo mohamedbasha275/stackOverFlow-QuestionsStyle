@@ -1,11 +1,14 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stackover/models/main_data.dart';
-import 'package:stackover/models/routes.dart';
-import 'package:stackover/providers/questions.dart';
-import 'package:stackover/providers/question.dart';
+import 'package:stackover/models/owner.dart';
+import 'package:stackover/models/question.dart';
+import 'package:stackover/models/questions.dart';
 import 'package:stackover/screens/home_screen.dart';
+import 'package:stackover/services/app_colors.dart';
+import 'package:stackover/services/llight_mode.dart';
+import 'package:stackover/services/main_data.dart';
+import 'package:stackover/services/routes.dart';
 
 void main() {
   runApp(const MyHomePage());
@@ -21,19 +24,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      systemNavigationBarColor: Colors.white,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: AppColors.statusBarColor,
+        systemNavigationBarColor: AppColors.navigationBarColor,
+      ),
+    );
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
             create: (_) => Question(
                 id: 1,
                 title: '',
-                ownerName: '',
-                ownerImage: '',
-                ownerProfile: '',
+                owner: Owner(name: '', image: '', profile: ''),
                 isAnswered: false,
                 viewCount: 0,
                 fullDate: '',

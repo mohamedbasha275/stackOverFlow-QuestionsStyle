@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:stackover/models/owner.dart';
+import 'package:stackover/models/tag.dart';
 
 class Question with ChangeNotifier {
   final int id;
   final String title;
-  final String ownerName;
-  final String ownerImage;
-  final String ownerProfile;
+  final Owner owner;
   final bool isAnswered;
   final int viewCount;
   final int answerCount;
@@ -14,14 +14,12 @@ class Question with ChangeNotifier {
   final String fullDate;
   final String lastActive;
   final String questionLink;
-  final List<String> tags;
+  final List<Tag> tags;
 
   Question({
     required this.id,
     required this.title,
-    required this.ownerName,
-    required this.ownerImage,
-    required this.ownerProfile,
+    required this.owner,
     required this.isAnswered,
     required this.viewCount,
     required this.answerCount,
